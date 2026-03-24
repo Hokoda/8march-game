@@ -1,105 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Игра для тебя ❤️</title>
-
+<title>Открытка для тебя 💌</title>
 <style>
-body{
-  margin:0;
-  overflow:hidden;
-  font-family:Arial;
-  text-align:center;
+  :root {
+    --bg1: #2b0a3d;
+    --bg2: #12122b;
+    --card: #ffe8f1;
+    --accent: #ff4f9a;
+    --accent-dark: #d93079;
+    --text: #3b1d31;
+  }
 
-  background-image:url("dog.jpg");
-  background-size:cover;
-  height:100vh;
-  background-position:center top;
-  background-repeat:no-repeat;
-}
+  * {
+    box-sizing: border-box;
+  }
 
-#score{
-  position:absolute;
-  top:20px;
-  left:20px;
-  font-size:22px;
-  color:white;
-  background:rgba(0,0,0,0.4);
-  padding:8px 12px;
-  border-radius:10px;
-}
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+    background: radial-gradient(circle at top, var(--bg1), var(--bg2) 65%);
+    overflow: hidden;
+  }
 
-.heart{
-  position:absolute;
-  font-size:34px;
-  cursor:pointer;
-}
+  .sparkles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: radial-gradient(#fff 0.7px, transparent 0.7px);
+    background-size: 24px 24px;
+    animation: drift 22s linear infinite;
+  }
 
-#message{
-  display:none;
-  position:absolute;
-  top:40%;
-  width:100%;
-  font-size:30px;
-  color:white;
-  text-shadow:2px 2px 8px black;
-  padding:20px;
-}
-</style>
-</head>
+  @keyframes drift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-24px); }
+  }
 
-<body>
+  .scene {
+    width: min(92vw, 460px);
+    text-align: center;
+    z-index: 1;
+  }
 
-<div id="score">❤️ Поймано: 0</div>
+  .hint {
+    margin: 0 0 18px;
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
 
-<div id="message">
-С 8 марта 🌸<br><br>
-Ты поймала все сердечки,<br>
-но моё уже давно у тебя ❤️
-</div>
+  .envelope {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    margin-inline: auto;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+  }
 
-<script>
+  .envelope:hover {
+    transform: translateY(-4px);
+  }
 
-let score = 0;
+  .body {
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #ffd6e9, #ffc0df);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  }
 
-function createHeart(){
-  const heart = document.createElement("div");
-  heart.classList.add("heart");
-  heart.innerHTML = "❤️";
+  .flap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 50%;
+    transform-origin: top;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: linear-gradient(145deg, #ff92c5, #ff6fb4);
+    border-radius: 20px 20px 0 0;
+    transition: transform 0.6s ease;
+    z-index: 3;
+  }
 
-  heart.style.left = Math.random()*window.innerWidth + "px";
-  heart.style.top = "-40px";
+  .seal {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    transform: translate(-50%, -50%);
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--accent);
+    display: grid;
+    place-items: center;
+    font-size: 1.9rem;
+    font-weight: 700;
+    z-index: 4;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.35s ease, opacity 0.35s ease;
+  }
 
-  document.body.appendChild(heart);
+  .letter {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    top: 13%;
+    bottom: 8%;
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--text);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    z-index: 1;
+    transform: translateY(22%);
+    transition: transform 0.55s ease;
+    box-shadow: inset 0 0 0 1px rgba(179, 74, 123, 0.15);
+  }
 
-  let fall = setInterval(()=>{
-    heart.style.top = heart.offsetTop + 3 + "px";
+  .letter h1 {
+    margin: 0;
+    font-size: clamp(1.05rem, 2.9vw, 1.35rem);
+  }
 
-    if(heart.offsetTop > window.innerHeight){
-      heart.remove();
-      clearInterval(fall);
+  .letter p {
+    margin: 0;
+    font-size: clamp(0.92rem, 2.4vw, 1rem);
+    line-height: 1.45;
+  }
+
+  .open .flap {
+    transform: rotateX(180deg);
+  }
+
+  .open .seal {
+    transform: translate(-50%, -50%) scale(0.65);
+    opacity: 0;
+  }
+
+  .open .letter {
+    transform: translateY(-6%);
+  }
+
+  .popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 6, 20, 0.78);
+    display: none;
+    place-items: center;
+    padding: 20px;
+    z-index: 10;
+  }
+
+  .popup.show {
+    display: grid;
+  }
+
+  .popup-card {
+    width: min(92vw, 380px);
+    background: #111;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    animation: popIn 0.35s ease;
+  }
+
+  .popup-card img {
+    width: 100%;
+    display: block;
+  }
+
+  .popup-caption {
+    margin: 0;
+    padding: 14px;
+    text-align: center;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .close {
+    width: 100%;
+    border: 0;
+    padding: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    background: var(--accent-dark);
+  }
+
+  @keyframes popIn {
+    from {
+      opacity: 0;
+      transform: scale(0.88);
     }
-  },20);
-
-  heart.onclick = ()=>{
-    score++;
-
-    document.getElementById("score").innerText =
-    "❤️ Поймано: " + score;
-
-    heart.remove();
-    clearInterval(fall);
-
-    if(score >= 10){
-      document.getElementById("message").style.display="block";
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
-}
+</style>
+</head>
+<body>
+  <div class="sparkles"></div>
 
-setInterval(createHeart,800);
+  <main class="scene">
+    <p class="hint">Нажми на конверт и открой открытку 💘</p>
 
+    <section class="envelope" id="envelope" aria-label="Открыть открытку">
+      <div class="body"></div>
+      <div class="flap"></div>
+      <div class="seal">❤</div>
+      <div class="letter">
+        <h1>Есть мини-челлендж для самой красивой ✨</h1>
+        <p>
+          Ты открыла секретный конверт!<br>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="popup" id="popup" role="dialog" aria-modal="true">
+    <div class="popup-card">
+      <img src="dog.jpg" alt="Забавная картинка" />
+      <p class="popup-caption">Это я, когда жду твою фоточку 😺</p>
+      <button class="close" id="closeBtn">Закрыть</button>
+    </div>
+  </div>
+
+<script>
+  const envelope = document.getElementById("envelope");
+  const popup = document.getElementById("popup");
+  const closeBtn = document.getElementById("closeBtn");
+
+  envelope.addEventListener("click", () => {
+    envelope.classList.add("open");
+    setTimeout(() => {
+      popup.classList.add("show");
+    }, 520);
+  }, { once: true });
+
+  closeBtn.addEventListener("click", () => {
+    popup.classList.remove("show");
+  });
+
+  popup.addEventListener("click", (event) => {
+    if (event.target === popup) {
+      popup.classList.remove("show");
+    }
+  });
 </script>
-
 </body>
 </html>
 
