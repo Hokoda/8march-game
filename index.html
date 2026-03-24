@@ -14,9 +14,7 @@
     --text: #3b1d31;
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
@@ -65,9 +63,7 @@
     transition: transform 0.25s ease;
   }
 
-  .envelope:hover {
-    transform: translateY(-4px);
-  }
+  .envelope:hover { transform: translateY(-4px); }
 
   .body {
     position: absolute;
@@ -141,18 +137,14 @@
     line-height: 1.45;
   }
 
-  .open .flap {
-    transform: rotateX(180deg);
-  }
+  .open .flap { transform: rotateX(180deg); }
 
   .open .seal {
     transform: translate(-50%, -50%) scale(0.65);
     opacity: 0;
   }
 
-  .open .letter {
-    transform: translateY(-6%);
-  }
+  .open .letter { transform: translateY(-6%); }
 
   .popup {
     position: fixed;
@@ -164,9 +156,7 @@
     z-index: 10;
   }
 
-  .popup.show {
-    display: grid;
-  }
+  .popup.show { display: grid; }
 
   .popup-card {
     width: min(92vw, 380px);
@@ -181,6 +171,9 @@
   .popup-card img {
     width: 100%;
     display: block;
+    background: #1d1d1d;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
   }
 
   .popup-caption {
@@ -203,9 +196,7 @@
     cursor: pointer;
   }
 
-  .close:hover {
-    background: var(--accent-dark);
-  }
+  .close:hover { background: var(--accent-dark); }
 
   @keyframes popIn {
     from {
@@ -240,7 +231,7 @@
 
   <div class="popup" id="popup" role="dialog" aria-modal="true">
     <div class="popup-card">
-      <img src="dog.jpg" alt="Забавная картинка" />
+      <img id="popupImage" src="dogi.jpg" alt="Забавная картинка" loading="eager">
       <p class="popup-caption">Это я, когда жду твою фоточку 😺</p>
       <button class="close" id="closeBtn">Закрыть</button>
     </div>
@@ -249,7 +240,27 @@
 <script>
   const envelope = document.getElementById("envelope");
   const popup = document.getElementById("popup");
+  const popupImage = document.getElementById("popupImage");
   const closeBtn = document.getElementById("closeBtn");
+
+  popupImage.addEventListener("error", () => {
+    const fallbackSvg = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+        <defs>
+          <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#2b0a3d"/>
+            <stop offset="100%" stop-color="#12122b"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="800" fill="url(#g)"/>
+        <text x="50%" y="44%" text-anchor="middle" fill="#fff" font-size="120">😺</text>
+        <text x="50%" y="54%" text-anchor="middle" fill="#ffd6e9" font-size="32" font-family="Arial">Картинка не загрузилась</text>
+        <text x="50%" y="60%" text-anchor="middle" fill="#ffffff" font-size="28" font-family="Arial">но я всё равно жду твою фоточку 📸</text>
+      </svg>`
+    )}`;
+
+    popupImage.src = fallbackSvg;
+  }, { once: true });
 
   envelope.addEventListener("click", () => {
     envelope.classList.add("open");
